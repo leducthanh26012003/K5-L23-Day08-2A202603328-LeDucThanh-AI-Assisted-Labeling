@@ -47,10 +47,12 @@ Nguồn: `qc/review_stats.md` (24 ảnh batch; đã loại 21 đối tượng qu
 
 | Ảnh | SAM (phiên bản) | Số click | Mask gồm người lái / hàng hoá? | Lỗi quan sát | File trong `masks/` |
 |---|---|---|---|---|---|
-| <<img_0xx>> | <<>> | <<>> | <<>> | <<>> | <<>> |
+| img_010 (xích lô phía trước, người đạp ngồi sau) | SAM 2.1 base (`sam2.1_b.pt`) | 4 (3 dương: mui, bánh sau, bánh trái; 1 âm: lưng người đạp) | Không gồm người đạp (đúng 4.2 mục 4: người ở phía trước khung xe) | Lấm tấm vài đốm trên sọc trắng áo người đạp và trên cột mui. Thử thêm click âm thứ 5 lên sọc trắng áo thì mask **tệ hơn**: lỗ chỗ và lan sang xích lô phía sau, nên giữ bản 4 click | `cyclo_img010.jpg` |
+| img_023 (tuk-tuk giữa, có khách ngồi trong, người đứng chạm xe) | SAM 2.1 base | 4 (2 dương: mui, bánh trước; 2 âm: người đứng, khách ngồi) | Không gồm khách ngồi trong xe và người đứng cạnh | Lần 1 (3 click) mask nuốt cả khách ngồi bên trong; thêm click âm lên khách thì tách được. Mui, thân, hai bánh bám biên tốt | `tuktuk_img023.jpg` |
+| img_009 (xe máy đỗ chở hàng: bao, túi, chuối) | SAM 2.1 base | 7 (4 dương: bánh trước, bánh sau, tay lái, giỏ; 3 âm: đống chuối, bao trắng, túi xanh) | Không gồm hàng (bao, túi, chuối); có giỏ xe vì là bộ phận gắn liền | Lần 1 (3 click) chỉ ra bánh trước và **một túi xanh** (click dương rơi trúng túi). Hàng che gần hết thân xe nên phải chấm từng phần nhìn thấy; mask cuối có 2 polygon (thân xe bị túi xanh cắt đôi) | `moto_cargo_img009.jpg` |
 
-- Đối chiếu guideline mục 4.2: quy tắc nào giúp, quy tắc nào thiếu? <<>>
-- *(Tuỳ chọn)* Interactor SAM trong CVAT: làm được / không (lỗi gì, đã thử gì); khác gì offline: <<>>
+- Đối chiếu guideline mục 4.2: quy tắc nào giúp, quy tắc nào thiếu? **Giúp:** mục 4 ("hai vật chạm nhau: vùng chạm thuộc vật ở phía trước") quyết định rõ cho img_010 và img_023: người đạp, khách ngồi, người đứng đều ở phía trước khung xe nên bỏ khỏi mask xe. Mục 2 (lỗ thủng nhỏ hơn ~5% thì không cần vẽ) cho phép bỏ qua các khoảng hở nhỏ giữa nan bánh và khung xích lô. **Thiếu:** 4.2 không nói **hàng hoá chở trên xe máy** có thuộc mask không (bảng lớp chỉ nói `three_wheeler` gồm "thùng hàng gắn liền xe"); với img_009 tôi chọn bỏ hàng, giữ giỏ, nhưng đây là câu hỏi cần chốt ở v1.1. Cũng chưa có quy tắc khi hàng che xe thành nhiều mảnh: một mask nhiều polygon hay nối lại (img_009 ra 2 polygon).
+- *(Tuỳ chọn)* Interactor SAM trong CVAT: làm được / không (lỗi gì, đã thử gì); khác gì offline: chưa thử (CVAT trên máy chưa cài serverless/Nuclio cho AI Tools).
 
 ## 6. Calibration (Part 6)
 

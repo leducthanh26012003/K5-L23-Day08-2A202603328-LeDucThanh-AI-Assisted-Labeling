@@ -1,2 +1,3 @@
 step,images,minutes,note
 gold_manual,4,15,gán tay trên CVAT không dùng AI; 43 đối tượng
+batch_review,24,20,duyệt và sửa pre-label (pre_traps_import) trên CVAT; 441 đối tượng sau duyệt

@@ -19,27 +19,29 @@
 
 | Trạng thái | Số | Tỉ lệ | Mẫu số |
 |---|---|---|---|
-| accepted | <<>> | <<>> | <<box máy>> |
-| edited | <<>> | <<>> | <<>> |
-| deleted | <<>> | <<>> | <<>> |
-| added | <<>> | <<>> | <<đối tượng sau duyệt>> |
+| accepted | 396 | 90.4% | 438 box máy |
+| edited | 5 | 1.1% | 438 box máy |
+| deleted | 30 | 6.8% | 438 box máy |
+| added | 22 | 5.2% | 423 đối tượng sau duyệt |
 
-- Lớp nào máy tệ nhất? Vì sao (dẫn ảnh)? <<>>
-- So với gold: precision / recall của **máy** <<>> (mẫu số: <<đối tượng gold>>)
+Nguồn: `qc/review_stats.md` (24 ảnh batch; đã loại 21 đối tượng quanh 12 bẫy vì lỗi nhân tạo không phản ánh máy). Trong deleted + added có 7 trường hợp là **đổi lớp** (box đúng chỗ, sai lớp), nên số vật máy **sót thật** khoảng 22 − 7 = 15.
+
+- Lớp nào máy tệ nhất? Vì sao (dẫn ảnh)? **`three_wheeler`**: trong 40 box máy chỉ giữ nguyên 15 (37.5%), xoá 21, sửa 4, phải vẽ thêm 5; các lớp khác giữ nguyên trên 90% (person 188/190, motorbike 132/134, car 49/51). Box thừa dồn ở img_003 (máy 8 box, giữ 4), img_013 (4 → 1), img_014 (3 → 0), img_018 (2 → 0). Nguyên nhân: ngưỡng `three_wheeler=0.15` chọn trên 4 ảnh gold quá thấp cho cả lô; ở 0.15 YOLOE bắn cả vào vật không phải xe ba bánh (đã thấy ở pilot: pickup img_002 0.37, và trên gold: hàng rào img_012 0.45). Ngưỡng in-sample đẹp trên gold (precision 78%) nhưng ra lô thì hơn nửa box là thừa.
+- So với gold: precision / recall của **máy** 61.7% (29/47 box máy, KTC 95%: 47–74%) / 80.6% (29/36, KTC 95%: 65–90%) (mẫu số: 36 đối tượng gold, không tính 7 `ignore_region`). Số này lạc quan vì ngưỡng chọn trên chính 4 ảnh này. Ngược lại, một phần FP là do gold của tôi sót (người ngồi trong tuk-tuk img_012, img_020; xem mục 1), nên precision thật có thể cao hơn một chút.
 
 ## 3. Thiên kiến tự động hóa và ảnh bẫy
 
-- Bắt bẫy: <<.../12>>; loại nào lọt: <<>>; vì sao (bạn đã bỏ bước nào của checklist)? <<>>
-- Accepted cao mà bắt bẫy thấp (hoặc ngược lại) nói gì về cách bạn duyệt? <<>>
+- Bắt bẫy: **4/12 = 33.3%** (KTC 95%: 14–61%; ngưỡng đạt 80%); loại nào lọt: mỗi loại lọt 2/3 — **missing** img_018 (người 32×48 px), img_021 (xe máy 41×85 px); **loose** img_029, img_006 (xe máy khoảng 50×65 px, box lệch khoảng 10 px); **wrong_class** img_027 (người 7×21 px bị đổi thành `bicycle`), img_024 (`car` bị đổi thành `truck`); **extra** img_017 (box `motorbike` trên mái hiên, không có xe), img_013 (box `person` trên nóc tuk-tuk, chỗ trống). Bẫy bắt được phần lớn là vật to hoặc lệch lớn: img_009 xe đạp bị xoá (212×155 px), img_005 box `truck` thừa (94×188 px), img_023 tuk-tuk box lệch mạnh; thêm img_003 người bị gọi `bicycle`. Vì sao: tôi duyệt 24 ảnh trong 20 phút (≈ 50 giây/ảnh, checklist gợi ý ~3 phút/ảnh), nên bỏ **bước 0** (ẩn nhãn máy, tự đếm trước) và không đi qua **từng box** ở bước 2 (thừa) và bước 4 (lỏng). Hai box thừa nằm trên nền trống (mái hiên, nóc xe) chỉ cần nhìn từng box là thấy. 4/8 bẫy lọt nằm ở ảnh dày xe máy (018, 021, 024, 029) — đúng nhóm ảnh guide dặn phải quét theo góc phần tư.
+- Accepted cao mà bắt bẫy thấp (hoặc ngược lại) nói gì về cách bạn duyệt? Accepted 90.4% đi cùng bắt bẫy 33% nghĩa là phần lớn "accepted" là **bấm chấp nhận chứ chưa kiểm**: nếu tôi thật sự kiểm từng box thì phải thấy 2 box thừa trên nền trống. Đây là thiên kiến tự động hóa: box máy trông hợp lý nên mắt không quay lại ảnh. Vì vậy 90.4% accepted không chứng minh máy tốt; con số máy đáng tin hơn là recall 80.6% trên gold (máy sót khoảng 1/5 vật) và lỗi `three_wheeler` ở mục 2.
 
 ## 4. Máy có đáng dùng không?
 
-- Thời gian (từ `time_log.csv`): gán tay <<... phút/ảnh>> vs duyệt <<... phút/ảnh>>. Thiên lệch (bạn gán gold trước nên đã quen cảnh): <<>>
-- Kết luận: <<có / không / chỉ cho lớp nào>>, dựa trên <<số liệu>>
+- Thời gian (từ `time_log.csv`): gán tay **3.75 phút/ảnh** (15 phút / 4 ảnh gold) vs duyệt **0.83 phút/ảnh** (20 phút / 24 ảnh). Thiên lệch (bạn gán gold trước nên đã quen cảnh): duyệt làm sau gán tay nên đã quen CVAT và label contract, phần nhanh hơn không hoàn toàn do máy; thêm nữa tốc độ duyệt này đi kèm bắt bẫy chỉ 33%, nên 0.83 phút/ảnh là tốc độ của một lần duyệt **chưa đủ kỹ**, không phải tốc độ chuẩn. Ngay cả nếu duyệt đúng checklist (~3 phút/ảnh) thì vẫn nhanh hơn gán tay một chút, và ảnh batch dày hơn gold (trung bình 18.0 đối tượng/ảnh, 433/24 không tính `ignore_region`, so với 9 ở gold, 36/4).
+- Kết luận: **có, nhưng chỉ cho person / motorbike / car / bicycle**; **không** dùng `three_wheeler` ở ngưỡng 0.15. Dựa trên: các lớp COCO được giữ nguyên trên 90% (person 188/190, motorbike 132/134, car 49/51) và recall máy trên gold 80.6% (29/36); còn `three_wheeler` bị xoá 21/40 box. Với `three_wheeler` nên nâng ngưỡng (gold cho thấy 0.3 vẫn giữ precision 83%, recall 71%) hoặc vẽ tay. Điều kiện: phải duyệt đúng checklist, vì ở tốc độ hiện tại tôi để lọt 8/12 lỗi của máy.
 - **Ba quy tắc giảm thiên kiến của bạn** (mỗi quy tắc kiểm tra được bằng số hoặc việc làm):
-  1. <<>>
-  2. <<>>
-  3. <<>>
+  1. **Bước 0 trên 24/24 ảnh:** ẩn nhãn máy, nhẩm đếm vật theo lớp và ghi số đếm vào một bảng trước khi bật nhãn; cuối buổi so số đếm với số box sau duyệt, ảnh nào lệch > 2 vật thì duyệt lại. Kiểm: bảng có đủ 24 dòng.
+  2. **Đi hết danh sách object của CVAT cho từng ảnh**, mở to mọi box cao < 60 px và mọi box ở vùng nền (trời, mái, tường); với 6 ảnh dày (005, 018, 021, 024, 028, 029) quét theo 4 góc phần tư. Kiểm: số box đã kiểm = số box máy của ảnh; mục tiêu lần sau bắt bẫy `extra` và `loose` 3/3.
+  3. **Không duyệt dưới 2 phút/ảnh** (24 ảnh ≥ 48 phút) và nghỉ 3–5 phút sau mỗi 8 ảnh; nếu `time_log` cho thấy nhanh hơn thì duyệt lại lô. Kiểm: `batch_review` trong `time_log.csv` ≥ 48 phút và bắt bẫy ≥ 80% (≥ 10/12).
 
 ## 5. Mask SAM cho 3 vật (Part 5)
 

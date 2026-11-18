@@ -56,26 +56,26 @@ Nguồn: `qc/review_stats.md` (24 ảnh batch; đã loại 21 đối tượng qu
 
 ## 6. Calibration (Part 6)
 
-- Số quyết định: <<>> (`calibration_decisions.csv`); quan trọng nhất (dẫn `CAL-xx`): <<>>
-- Quy tắc mới đã vào `guideline_v1.1_calibrated.md`: <<>>
-- Nguyên nhân gốc: <<guideline mơ hồ / chưa nắm quy tắc / máy>>
+- Số quyết định: **9** (`calibration_decisions.csv`: 4 `loi_may`, 4 `cau_hoi_mo`, 1 `bay_lot`); quan trọng nhất (dẫn `CAL-xx`): **CAL-02** và **CAL-03**, cùng về `three_wheeler`. Đây là lớp máy tệ nhất (21/40 box bị xoá khi duyệt, mục 2) và cũng là nguồn của lỗi hệ thống "thừa" mà QC bắt được (img_003 có 3 box cho một xe ba gác, mục 7). Nếu không sửa recipe (ngưỡng 0.3, một xe một box) thì lô sau sẽ lặp lại đúng lỗi này.
+- Quy tắc mới đã vào `guideline_v1.1_calibrated.md`: chốt câu 2 (khối xe máy đỗ gần camera: box riêng khi thấy bánh hoặc yên cùng tay lái, phần chồng sau từ 5 xe là một `ignore_region`), câu 3 (box và mask xe không gồm hàng chở; giỏ, baga thì gồm), câu 4 (người trong tuk-tuk: gán khi thấy đầu và vai, thay cho ước lượng 20%), câu 7 (không đặt `conf` tối thiểu); thêm ca "một xe ba bánh = một box bao cả mui và thùng". Câu 1, 5, 6 chưa chốt vì lô chưa có ca.
+- Nguyên nhân gốc: **guideline mơ hồ** ở CAL-05, 06, 07, 08 (câu 4 và câu 3 làm tôi gán không nhất quán giữa gold và batch); **máy** ở CAL-01, 02, 03 (SUV gọi `truck`, ngưỡng `three_wheeler` thấp, nhiều box cho một xe); **tôi chưa áp đúng quy tắc đã có** ở CAL-04 (giữ 8 box dưới 20 px dù mục 4.1.6 đã rõ), CAL-09 (2 box thừa lọt) và ở gold img_036 (box `motorbike` bao cả người lái, trái mục 4 của contract).
 
 ## 7. QC và quyết định (Part 6)
 
-- Mẫu: <<n>> ảnh (<<m>> ảnh `can_review` + <<k>> ngẫu nhiên, seed 42); người kiểm: bạn (**hạn chế**: bạn vừa là người duyệt).
-- Lỗi theo **đối tượng**: <<.../... = ...%>> · theo **ảnh**: <<.../... = ...%>> (ngưỡng Release ≤ 2%)
-- Top lỗi (trong: bỏ sót, thừa, sai lớp, sai vị trí/kích thước, sai thuộc tính, sai mask) + một ảnh ví dụ mỗi loại: <<>>
-- **Giới hạn mẫu nhỏ** (cận trên 95% trong `qc_report_auto.md`): <<>>
-- Script kiểm được / không kiểm được (ví dụ ôm sát, cùng bỏ sót với máy, theo checklist thật): <<>>
+- Mẫu: **5** ảnh (**0** ảnh `can_review` vì tôi không tick box nào + **5** ngẫu nhiên, seed 42): img_003, img_006, img_014, img_031, img_035; 90 đối tượng. Người kiểm: bạn (**hạn chế**: bạn vừa là người duyệt).
+- Lỗi theo **đối tượng**: **5/90 = 5.6%** · theo **ảnh**: **2/5 = 40.0%** (ngưỡng Release ≤ 2%)
+- Top lỗi (trong: bỏ sót, thừa, sai lớp, sai vị trí/kích thước, sai thuộc tính, sai mask) + một ảnh ví dụ mỗi loại: **thừa 3/5** (img_003: box `three_wheeler` ở mép trái chỉ là xe đẩy bán hàng; hai box chỉ bao mui hoặc thùng của cùng một xe ba gác đã có box). **Sai vị trí / kích thước 2/5** (img_003: box xe ba gác cắt mất khoảng 35 px mui; img_006: box xe máy đỗ lệch lên khoảng 12 px, chính là bẫy `loose` bị lọt ở Part 4). Không thấy bỏ sót hay sai lớp trong 5 ảnh mẫu. "Thừa" chiếm 3/5 lỗi nên `qc_report.py` đánh dấu là **lỗi hệ thống**.
+- **Giới hạn mẫu nhỏ** (cận trên 95% trong `qc_report_auto.md`): 2 ảnh lỗi trong 5 ảnh cho cận trên Wilson 95% là **77%**; mẫu chỉ có 5/24 ảnh nên ngưỡng 2% không thể được chứng minh, kể cả nếu mẫu không có lỗi nào (0/5 vẫn có thể là tới khoảng 60% theo quy tắc 3/n). Thêm nữa, mẫu ngẫu nhiên không rơi vào ảnh dày nào (005, 018, 021, 024, 028, 029), trong khi 4/8 bẫy lọt nằm ở các ảnh này, nên tỉ lệ lỗi thật của lô có thể **cao hơn** 40%.
+- Script kiểm được / không kiểm được (ví dụ ôm sát, cùng bỏ sót với máy, theo checklist thật): script kiểm được tên file, lớp có trong taxonomy, box nằm trong ảnh, đủ 24 ảnh, box dưới 20 px (8 cảnh báo), các tỉ lệ accepted / deleted / added, bắt bẫy và tỉ lệ lỗi từ phiếu QC. Script **không** kiểm được box có ôm sát vật thật không (2 lỗi vị trí ở trên chỉ thấy bằng mắt), box có trùng cùng một vật không (img_003), vật mà **cả máy lẫn tôi** cùng bỏ sót ở ảnh ngoài gold, và tôi có thật sự làm bước 0 của checklist hay không. Người kiểm QC cũng chính là người duyệt nên dễ bỏ qua đúng những lỗi đã bỏ qua lúc duyệt.
 
-**Quyết định: <<Release / Hold / Rework>>**, ngày <<YYYY-MM-DD>>. Lý do (đi theo Hold → Rework → Release): <<>>
-Nếu Rework / Hold, việc cần làm tiếp: <<>>
+**Quyết định: Rework**, ngày 2026-11-18. Lý do (đi theo Hold → Rework → Release): **không Hold** vì các câu hỏi mở có ca trong lô (câu 2, 3, 4, 7) đã chốt ở v1.1, câu 1, 5, 6 không có ca nào trong lô, và không có ảnh hỏng; **Rework** vì cả ba điều kiện đều không đạt: ảnh có lỗi 2/5 = 40% > 2%, lỗi hệ thống "thừa" chiếm 3/5 lỗi, và bắt bẫy 4/12 = 33% < 80% nên lần duyệt chưa đáng tin.
+Nếu Rework / Hold, việc cần làm tiếp: (1) duyệt lại cả 24 ảnh theo checklist 4 bước, v1.1 và 3 quy tắc ở mục 4 (≥ 48 phút, đếm trước 24/24 ảnh); (2) sửa các lỗi đã biết: img_003 xoá 3 box thừa và kéo lại box xe ba gác, img_006 kéo lại box xe máy, xoá hoặc thay bằng `ignore_region` 8 box dưới 20 px (CAL-04), xoá 2 box thừa ở img_017 và img_013, sửa các bẫy lọt còn lại (img_018, img_021 thiếu vật; img_024, img_027 sai lớp; img_029 box lỏng), đổi SUV / bán tải từ `truck` sang `car`, thêm `person` cho người ngồi trong tuk-tuk theo câu 4; (3) export các ảnh đã sửa thành `labels/qc_fixed.json`, chạy lại `build_release.py`, `qc_sample.py --force` (vòng 2, nên lấy cả ảnh dày) và `qc_report.py`, ghi vòng 2 vào báo cáo; (4) lô sau dùng ngưỡng `three_wheeler=0.3`.
 
 ## 8. Ghi chú cá nhân
 
-- **Dùng AI để làm bài** (công cụ nào, việc gì, kiểm tra thế nào; "không dùng" nếu không): <<>>
-- Gold có bị nhiễm không (bạn có nhìn pre-label hay hỏi AI trước khi gán xong)? <<không / có, như sau: ...>>
-- Máy / GPU / CVAT dùng; vướng mắc cài đặt: <<>>
-- Dùng cache `data/cache/` thay vì tự chạy? <<không / có, vì ...>>
-- Lỗi / bug script đã gặp (nếu có): <<>>
-- Một điều bạn làm khác lần sau: <<>>
+- **Dùng AI để làm bài** (công cụ nào, việc gì, kiểm tra thế nào; "không dùng" nếu không): Claude, gợi ý ghi chú và kiểm tra lỗi cho báo cáo.
+- Gold có bị nhiễm không (bạn có nhìn pre-label hay hỏi AI trước khi gán xong)? **Không**: tôi không xem nhãn máy của 4 ảnh gold và không hỏi AI về các ảnh này trước khi export `gold_manual.json` (15 phút gán tay). Sau khi export, lúc đối chiếu máy với gold tôi thấy gold có vài chỗ lệch contract (img_036, img_012, img_020; xem mục 1) nhưng **không sửa gold**, để gold vẫn là chuẩn độc lập.
+- Máy / GPU / CVAT dùng; vướng mắc cài đặt: Windows 11 + WSL2 Ubuntu, Python 3.10.12, torch 2.14.1 bản CPU (máy có NVIDIA MX330 2 GB nhưng không dùng), CVAT v2.74.1 chạy Docker. Vướng mắc: Windows chỉ có Python 3.14 (lab cần 3.10–3.13) nên chạy mọi script bằng venv trong WSL; venv ban đầu thiếu `transformers` và `huggingface_hub`; model tải ở thư mục khác phải chép vào `models/` của repo, thêm `yolo26m.pt`.
+- Dùng cache `data/cache/` thay vì tự chạy? **Không**: tự chạy YOLO26m (0.74 s/ảnh) và YOLOE-26s (0.38 s/ảnh) trên CPU cho cả 36 ảnh.
+- Lỗi / bug script đã gặp (nếu có): không sửa script nào. Một điểm cần biết của `merge_prelabels.py` (đúng như mô tả trong script, không phải bug): box trong **cùng một file** không bị loại lẫn nhau, nên YOLOE để lại 3 box cho một xe ba gác ở img_003. Khi gộp nên tự loại trùng trong từng file trước.
+- Một điều bạn làm khác lần sau: duyệt chậm và theo đúng checklist (đếm trước khi bật nhãn máy, đi hết từng box), và không lấy ngưỡng in-sample từ 4 ảnh gold làm ngưỡng cuối cho lớp hiếm như `three_wheeler`: thử trên vài ảnh batch trước khi gộp cả lô.

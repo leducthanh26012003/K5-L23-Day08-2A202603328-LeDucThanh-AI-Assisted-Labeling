@@ -1,0 +1,9 @@
+image,object_id,error_type,reviewer,note
+img_003.jpg,2,thua,2A202603328,"Box three_wheeler ở mép trái chỉ là xe đẩy bán hàng bị cắt mép, không phải xe ba bánh"
+img_003.jpg,3,thua,2A202603328,"Trùng xe ba gác chở rau: box #3 chỉ bao phần mui, xe đã có box #15"
+img_003.jpg,9,thua,2A202603328,"Trùng xe ba gác chở rau: box #9 chỉ bao phần thùng, xe đã có box #15"
+img_003.jpg,15,sai_vi_tri_kich_thuoc,2A202603328,"Mép trên dừng ở y=145, cắt mất khoảng 35 px mui phía phải (mui cao tới khoảng y=108)"
+img_006.jpg,66,sai_vi_tri_kich_thuoc,2A202603328,"Box xe máy đỗ lệch lên trên khoảng 12 px và cao hơn xe (bẫy loose bị lọt ở Part 4)"
+img_014.jpg,,khong,2A202603328,"Người gánh hàng, xe máy đang chạy và xe đỗ bên phải đều có box đúng lớp"
+img_031.jpg,,khong,2A202603328,"Người bán hàng, xe đạp chở hàng, người ngồi bên phải: đủ và đúng lớp"
+img_035.jpg,,khong,2A202603328,Xích lô #432 đúng three_wheeler; người và xe máy ở xa có box; không thấy box thừa

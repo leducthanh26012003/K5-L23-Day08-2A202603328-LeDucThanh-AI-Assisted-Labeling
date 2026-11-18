@@ -5,7 +5,7 @@
 - Lớp (L2 / L3 / khác): L2
 - Tài khoản GitHub: leducthanh26012003
 - Repo bài nộp (URL): https://github.com/leducthanh26012003/K5-L23-Day08-2A202603328-LeDucThanh-AI-Assisted-Labeling
-- Commit chốt bài (hash): <<>>
+- Commit chốt bài (hash): 6724b71438b769ab8a55737968825a60776f4d3b
 - Máy: Windows 11 + WSL2 Ubuntu, Python 3.10.12; GPU: không dùng (torch bản CPU, máy có NVIDIA MX330 2 GB)
 - CVAT (Docker): v2.74.1
 
